@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Tracker — William</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        /* Summary Cards */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .card-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .card-value.positive { color: #22c55e; }
+        .card-value.negative { color: #ef4444; }
+        .card-value.zero { color: #666; }
+        
+        /* Entry Form */
+        .entry-form {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full {
+            grid-column: span 2;
+        }
+        
+        label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 6px;
+        }
+        
+        input, select {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+        
+        button {
+            background: #22c55e;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+        
+        button:hover {
+            background: #16a34a;
+        }
+        
+        /* Category Breakdown */
+        .breakdown {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .breakdown h2 {
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        
+        .category-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+        }
+        
+        .category-row:last-child {
+            border-bottom: none;
+        }
+        
+        .cat-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .cat-sportsgrid { background: #3b82f6; }
+        .cat-ebay { background: #f59e0b; }
+        .cat-facebook { background: #8b5cf6; }
+        .cat-gambling { background: #ef4444; }
+        .cat-trading { background: #22c55e; }
+        .cat-other { background: #6b7280; }
+        
+        .cat-value {
+            font-weight: 600;
+        }
+        
+        /* History */
+        .history {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .history h2 {
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .clear-btn {
+            background: #333;
+            color: #888;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            width: auto;
+            margin: 0;
+        }
+        
+        .clear-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        .entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #222;
+        }
+        
+        .entry:last-child {
+            border-bottom: none;
+        }
+        
+        .entry-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .entry-cat {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        .entry-date {
+            font-size: 0.7rem;
+            color: #555;
+        }
+        
+        .entry-amount {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .entry-amount.positive { color: #22c55e; }
+        .entry-amount.negative { color: #ef4444; }
+        
+        .delete-entry {
+            background: transparent;
+            color: #555;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            width: auto;
+            margin: 0 0 0 12px;
+        }
+        
+        .delete-entry:hover {
+            color: #ef4444;
+            background: transparent;
+        }
+        
+        .no-entries {
+            text-align: center;
+            color: #555;
+            padding: 20px;
+        }
+        
+        /* Period Toggle */
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .period-btn {
+            flex: 1;
+            background: #0a0a0a;
+            color: #888;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .period-btn.active {
+            background: #22c55e;
+            color: #000;
+        }
+        
+        .period-btn:hover:not(.active) {
+            background: #222;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Income Tracker</h1>
+        <p class="subtitle">Cost Plus Capital</p>
+        
+        <!-- Summary Cards -->
+        <div class="summary">
+            <div class="card">
+                <div class="card-label">Today</div>
+                <div class="card-value zero" id="today-total">$0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">This Week</div>
+                <div class="card-value zero" id="week-total">$0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">This Month</div>
+                <div class="card-value zero" id="month-total">$0</div>
+            </div>
+        </div>
+        
+        <!-- Entry Form -->
+        <div class="entry-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="category">
+                        <option value="sportsgrid">SportsGrid</option>
+                        <option value="ebay">eBay</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="gambling">Gambling</option>
+                        <option value="trading">Trading</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="entry-date">
+                </div>
+                <div class="form-group">
+                    <label>Note (optional)</label>
+                    <input type="text" id="note" placeholder="What was this for?">
+                </div>
+            </div>
+            <button onclick="addEntry()">Add Entry</button>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <div class="breakdown">
+            <h2>Monthly Breakdown</h2>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-sportsgrid"></span> SportsGrid</div>
+                <div class="cat-value" id="cat-sportsgrid">$0</div>
+            </div>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-ebay"></span> eBay</div>
+                <div class="cat-value" id="cat-ebay">$0</div>
+            </div>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-facebook"></span> Facebook</div>
+                <div class="cat-value" id="cat-facebook">$0</div>
+            </div>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-gambling"></span> Gambling</div>
+                <div class="cat-value" id="cat-gambling">$0</div>
+            </div>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-trading"></span> Trading</div>
+                <div class="cat-value" id="cat-trading">$0</div>
+            </div>
+            <div class="category-row">
+                <div class="cat-name"><span class="cat-dot cat-other"></span> Other</div>
+                <div class="cat-value" id="cat-other">$0</div>
+            </div>
+        </div>
+        
+        <!-- History -->
+        <div class="history">
+            <h2>
+                Recent Entries
+                <button class="clear-btn" onclick="clearAll()">Clear All</button>
+            </h2>
+            <div id="entries-list">
+                <div class="no-entries">No entries yet</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize
+        let entries = JSON.parse(localStorage.getItem('incomeEntries') || '[]');
+        
+        // Set default date to today
+        document.getElementById('entry-date').valueAsDate = new Date();
+        
+        function addEntry() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('entry-date').value;
+            const note = document.getElementById('note').value;
+            
+            if (!amount || !date) {
+                alert('Please enter an amount and date');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now(),
+                amount,
+                category,
+                date,
+                note,
+                createdAt: new Date().toISOString()
+            };
+            
+            entries.unshift(entry);
+            saveAndRender();
+            
+            // Reset form
+            document.getElementById('amount').value = '';
+            document.getElementById('note').value = '';
+            document.getElementById('amount').focus();
+        }
+        
+        function deleteEntry(id) {
+            entries = entries.filter(e => e.id !== id);
+            saveAndRender();
+        }
+        
+        function clearAll() {
+            if (confirm('Delete all entries? This cannot be undone.')) {
+                entries = [];
+                saveAndRender();
+            }
+        }
+        
+        function saveAndRender() {
+            localStorage.setItem('incomeEntries', JSON.stringify(entries));
+            render();
+        }
+        
+        function formatMoney(amount) {
+            const formatted = Math.abs(amount).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+            return amount < 0 ? '-' + formatted : formatted;
+        }
+        
+        function getClass(amount) {
+            if (amount > 0) return 'positive';
+            if (amount < 0) return 'negative';
+            return 'zero';
+        }
+        
+        function render() {
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            
+            // Week start (Sunday)
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            
+            // Month start
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            let todayTotal = 0;
+            let weekTotal = 0;
+            let monthTotal = 0;
+            
+            const categoryTotals = {
+                sportsgrid: 0,
+                ebay: 0,
+                facebook: 0,
+                gambling: 0,
+                trading: 0,
+                other: 0
+            };
+            
+            entries.forEach(entry => {
+                const entryDate = new Date(entry.date + 'T12:00:00');
+                
+                if (entry.date === today) {
+                    todayTotal += entry.amount;
+                }
+                
+                if (entryDate >= weekStart) {
+                    weekTotal += entry.amount;
+                }
+                
+                if (entryDate >= monthStart) {
+                    monthTotal += entry.amount;
+                    categoryTotals[entry.category] += entry.amount;
+                }
+            });
+            
+            // Update summary cards
+            const todayEl = document.getElementById('today-total');
+            todayEl.textContent = formatMoney(todayTotal);
+            todayEl.className = 'card-value ' + getClass(todayTotal);
+            
+            const weekEl = document.getElementById('week-total');
+            weekEl.textContent = formatMoney(weekTotal);
+            weekEl.className = 'card-value ' + getClass(weekTotal);
+            
+            const monthEl = document.getElementById('month-total');
+            monthEl.textContent = formatMoney(monthTotal);
+            monthEl.className = 'card-value ' + getClass(monthTotal);
+            
+            // Update category breakdown
+            Object.keys(categoryTotals).forEach(cat => {
+                const el = document.getElementById('cat-' + cat);
+                el.textContent = formatMoney(categoryTotals[cat]);
+                el.style.color = categoryTotals[cat] >= 0 ? '#22c55e' : '#ef4444';
+            });
+            
+            // Render entries list
+            const listEl = document.getElementById('entries-list');
+            
+            if (entries.length === 0) {
+                listEl.innerHTML = '<div class="no-entries">No entries yet</div>';
+                return;
+            }
+            
+            const categoryNames = {
+                sportsgrid: 'SportsGrid',
+                ebay: 'eBay',
+                facebook: 'Facebook',
+                gambling: 'Gambling',
+                trading: 'Trading',
+                other: 'Other'
+            };
+            
+            listEl.innerHTML = entries.slice(0, 20).map(entry => {
+                const date = new Date(entry.date + 'T12:00:00');
+                const dateStr = date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+                });
+                
+                return `
+                    <div class="entry">
+                        <div class="entry-info">
+                            <div class="entry-cat">${categoryNames[entry.category]}${entry.note ? ' — ' + entry.note : ''}</div>
+                            <div class="entry-date">${dateStr}</div>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <div class="entry-amount ${getClass(entry.amount)}">${formatMoney(entry.amount)}</div>
+                            <button class="delete-entry" onclick="deleteEntry(${entry.id})">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Enter key to submit
+        document.getElementById('amount').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addEntry();
+        });
+        
+        document.getElementById('note').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addEntry();
+        });
+        
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
